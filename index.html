@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AR Video + Buttons Below</title>
+
+<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+<style>
+  body { margin: 0; overflow: hidden; }
+</style>
+</head>
+
+<body>
+
+<a-scene mindar-image="imageTargetSrc: targets (1).mind; autoStart: true;" 
+         color-space="sRGB" 
+         renderer="precision: high; antialias: true;" 
+         vr-mode-ui="enabled: false" 
+         device-orientation-permission-ui="enabled: false">
+
+  <!-- Assets -->
+  <a-assets>
+    <video id="myVideo" src="sample.mp4" preload="auto" loop muted playsinline webkit-playsinline crossorigin="anonymous"></video>
+    <img id="reviewImg" src="review.png">
+    <img id="shopImg" src="shop.png">
+  </a-assets>
+
+  <!-- Camera -->
+  <a-camera look-controls="enabled: false"></a-camera>
+
+  <!-- Target -->
+  <a-entity id="target" mindar-image-target="targetIndex: 0">
+
+    <!-- Video -->
+    <a-video id="videoPlane" src="#myVideo" width="1" height="0.56" position="0 0 0"></a-video>
+
+    <!-- Buttons below video -->
+    <a-image id="reviewBtn" src="#reviewImg" position="-0.25 -0.7 0.01" scale="0.25 0.25 0.25" visible="false" class="clickable"></a-image>
+    <a-image id="shopBtn" src="#shopImg" position="0.25 -0.7 0.01" scale="0.25 0.25 0.25" visible="false" class="clickable"></a-image>
+
+  </a-entity>
+</a-scene>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  const video = document.querySelector("#myVideo");
+  const reviewBtn = document.querySelector("#reviewBtn");
+  const shopBtn = document.querySelector("#shopBtn");
+  const target = document.querySelector("#target");
+
+  // Play video when target is found
+  target.addEventListener("targetFound", () => {
+    video.play();
+
+    // Show buttons after 12 seconds
+    setTimeout(() => {
+      reviewBtn.setAttribute("visible", true);
+      shopBtn.setAttribute("visible", true);
+    }, 12000);
+  });
+
+  // Hide buttons if target is lost
+  target.addEventListener("targetLost", () => {
+    reviewBtn.setAttribute("visible", false);
+    shopBtn.setAttribute("visible", false);
+    video.pause();
+  });
+
+  // Enable audio on tap
+  document.body.addEventListener("click", () => {
+    if(video.muted) video.muted = false;
+  });
+
+  // Button click actions
+  reviewBtn.addEventListener("click", () => {
+    window.open("https://your-review-link.com", "_blank");
+  });
+
+  shopBtn.addEventListener("click", () => {
+    window.open("https://your-shop-link.com", "_blank");
+  });
+
+});
+</script>
+
+</body>
+</html>
