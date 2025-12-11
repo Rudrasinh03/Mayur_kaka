@@ -1,227 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
-  <title>AR UI – Color Updated</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>AR Video Creator View</title>
 
-  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <!-- A-Frame + MindAR -->
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-  <style>
-    body { margin: 0; overflow: hidden; font-family: 'Montserrat', sans-serif; }
-
-    #status {
-      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-      background: linear-gradient(135deg, #ffd6a5, #fdffb6);
-      padding: 12px 26px;
-      border-radius: 30px;
-      font-size: 15px;
-      font-weight: 700;
-      color: #3b3b3b;
-      box-shadow: 0 6px 18px rgba(255, 200, 150, 0.35);
-      letter-spacing: 1px;
-      z-index: 1000;
-      pointer-events: none;
-    }
-
-    #discountPopup {
-      display: none; position: fixed; top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 85%; max-width: 350px;
-      background: linear-gradient(145deg, rgba(255,255,255,0.9), rgba(245,240,255,0.8));
-      border-radius: 22px;
-      padding: 28px 32px;
-      text-align: center;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.18);
-      backdrop-filter: blur(9px);
-      color: #333;
-      z-index: 2000;
-    }
-
-    #discountPopup h2 {
-      margin-top: 0;
-      background: -webkit-linear-gradient(#ff9cee, #8ec5fc);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      font-size: 22px;
-      font-weight: 700;
-    }
-
-    #discountPopup button {
-      margin-top: 22px;
-      width: 100%;
-      padding: 14px 0;
-      border: none;
-      border-radius: 40px;
-      font-size: 16px;
-      font-weight: bold;
-      background: linear-gradient(135deg, #ffd6a5, #fdffb6);
-      color: #333;
-      box-shadow: 0 6px 16px rgba(255, 200, 150, 0.45);
-      cursor: pointer;
-    }
-
-    #timeLimit { 
-      margin-top: 10px;
-      font-family: monospace; 
-      color: #666;
-    }
-
-    a-text { font-weight: 700; }
-  </style>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const WEBSITE_LINK = "https://www.google.com"; 
-
-      const status = document.getElementById("status");
-      const popup = document.getElementById("discountPopup");
-      const closeBtn = document.getElementById("closePopup");
-      const timeElem = document.getElementById("timeLimit");
-      const sound = document.getElementById("sound");
-      const scene = document.querySelector('a-scene');
-
-      scene.addEventListener('loaded', () => {
-        const websiteHitbox = document.querySelector('#hitbox-website');
-        if (websiteHitbox) {
-          websiteHitbox.addEventListener('click', () => {
-            sound.play().catch(()=>{});
-            const btn = document.querySelector('#hitbox-website').parentElement.querySelector('.visual-btn');
-            btn.setAttribute('animation__click', 'property: scale; to: 0.9 0.9 0.9; dur: 150; dir: alternate; loop: 1;');
-            window.open(WEBSITE_LINK, "_blank");
-          });
-        }
-
-        const discountHitbox = document.querySelector('#hitbox-discount');
-        if (discountHitbox) {
-          discountHitbox.addEventListener('click', () => {
-            sound.play().catch(()=>{});
-            const btn = document.querySelector('#hitbox-discount').parentElement.querySelector('.visual-btn');
-            btn.setAttribute('animation__click', 'property: scale; to: 0.9 0.9 0.9; dur: 150; dir: alternate; loop: 1;');
-            popup.style.display = "block";
-            startTimer();
-          });
-        }
-      });
-
-      const arTarget = document.querySelector('#ar-target');
-      if (arTarget) {
-        arTarget.addEventListener("targetFound", () => {
-          status.innerText = "✨ READY";
-          if (sound) sound.play().catch(()=>{});
-        });
-        arTarget.addEventListener("targetLost", () => {
-          status.innerText = "📷 SCAN CARD";
-        });
+    <style>
+      html, body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background: transparent;
       }
 
-      if(closeBtn) closeBtn.addEventListener("click", () => popup.style.display = "none");
-
-      function startTimer() {
-        const STORAGE_KEY = "pastel_timer_24h";
-        let expiry = localStorage.getItem(STORAGE_KEY);
-        const now = new Date().getTime();
-
-        if(!expiry || now > parseInt(expiry)) {
-          expiry = now + (24*60*60*1000);
-          localStorage.setItem(STORAGE_KEY, expiry);
-        }
-
-        if (window.timerInterval) clearInterval(window.timerInterval);
-
-        window.timerInterval = setInterval(() => {
-          const left = parseInt(expiry) - new Date().getTime();
-          if(left <= 0) {
-            clearInterval(window.timerInterval);
-            timeElem.innerText = "EXPIRED";
-          } else {
-            const h = Math.floor((left / (1000 * 60 * 60)) % 24);
-            const m = Math.floor((left / 1000 / 60) % 60);
-            timeElem.innerText = `ENDS IN: ${h}h ${m}m`;
-          }
-        }, 1000);
+      #status {
+        position: fixed;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: white;
+        font-family: "Poppins", sans-serif;
+        background: rgba(0, 0, 0, 0.5);
+        padding: 6px 12px;
+        border-radius: 8px;
+        z-index: 9999;
+        font-size: 14px;
       }
-    });
-  </script>
-</head>
 
-<body>
-  <div id="status">📷 SCAN CARD</div>
+      #watermark {
+        position: fixed;
+        bottom: 16px;
+        right: 16px;
+        color: #fff;
+        font-family: "Poppins", sans-serif;
+        font-size: 12px;
+        letter-spacing: 0.5px;
+        opacity: 0.8;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 4px 8px;
+        border-radius: 6px;
+        backdrop-filter: blur(3px);
+        z-index: 9999;
+      }
 
-  <div id="discountPopup">
-    <h2>OFFER UNLOCKED</h2>
-    <p>Code: <b>PASTEL2025</b></p>
-    <p id="timeLimit">Calculating...</p>
-    <button id="closePopup">CLOSE</button>
-  </div>
+      #watermark img {
+        height: 22px;
+        vertical-align: middle;
+        margin-right: 6px;
+        opacity: 0.9;
+      }
+    </style>
+  </head>
 
-  <audio id="sound" src="assets/sound/coin-win.mp3"></audio>
+  <body>
+    <div id="status">📷 Initializing camera...</div>
 
-  <a-scene 
-    mindar-image="imageTargetSrc: targets.mind; autoStart: true; uiError:no; uiLoading:no;" 
-    color-space="sRGB" 
-    renderer="colorManagement: true, physicallyCorrectLights" 
-    vr-mode-ui="enabled: false" 
-    device-orientation-permission-ui="enabled: false">
-    
-    <a-camera position="0 0 0" 
-              look-controls="enabled: false"
-              cursor="fuse: false; rayOrigin: mouse;" 
-              raycaster="far: 10000; objects: .clickable">
-    </a-camera>
+    <div id="watermark">
+      <img src="logo.jpg" alt="Logo" />
+      <span>Rudra</span>
+    </div>
 
-    <a-entity mindar-image-target="targetIndex: 0" id="ar-target">
+    <a-scene
+      mindar-image="imageTargetSrc: targets (1).mind; autoStart: true;"
+      color-space="sRGB"
+      renderer="colorManagement: true; physicallyCorrectLights: false; alpha: true;"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false"
+      embedded
+    >
+      <a-assets>
+        <video
+          id="myVideo"
+          src="test.mp4"
+          loop
+          muted
+          preload="auto"
+          playsinline
+          webkit-playsinline
+          crossorigin="anonymous"
+        ></video>
+      </a-assets>
 
-      <a-entity position="0 0 0">
+      <a-camera look-controls="enabled: false"></a-camera>
 
-        <!-- GLASS ROUNDED BORDER -->
-        <a-plane width="1.18" height="1.45" position="0 0 -0.02"
-                 material="color: #ffffff; opacity: 0.18;"
-                 radius="0.12">
-        </a-plane>
+      <a-entity mindar-image-target="targetIndex: 0" smooth-follow>
 
-        <!-- MAIN COLORFUL PANEL -->
-        <a-plane width="1.10" height="1.38" position="0 0 0"
-                 material="shader: standard; metalness: 0.1; roughness: 0.45; color: #ffb3c1;">
-        </a-plane>
-
-        <!-- OVERLAY GRADIENT PLANES -->
-        <a-plane width="1.10" height="1.38" position="0 0 0.01"
-                 material="shader: flat; opacity: 0.70; color: #8bd3c7;"></a-plane>
-        <a-plane width="1.10" height="1.38" position="0 0 0.02"
-                 material="shader: flat; opacity: 0.35; color: #fff3a1;"></a-plane>
-
-        <!-- HEADER TEXT -->
-        <a-text value="YOUR BRAND" width="3" align="center" color="#ffffff" position="0 0.58 0.06"></a-text>
-        <a-text value="SUMMER SALE" width="2.5" align="center" color="#ffefae" position="0 0.40 0.06"></a-text>
-        <a-text value="Scan done.\nTap below to continue." width="1.8" align="center" color="#ffffff" position="0 0.15 0.06"></a-text>
-
-        <!-- DIVIDER -->
-        <a-plane width="0.75" height="0.012" color="#ffffff" opacity="0.7" position="0 -0.03 0.05"></a-plane>
-
-        <!-- LOWER PANEL -->
-        <a-plane width="0.90" height="0.58" color="#ffffff" opacity="0.12" position="0 -0.35 0.03"></a-plane>
-
-        <!-- WEBSITE BUTTON -->
-        <a-entity position="-0.24 -0.28 0.06">
-          <a-plane class="visual-btn" width="0.46" height="0.17" material="shader: flat; color: #ffb97e; opacity: 1;" radius="0.085"></a-plane>
-          <a-text value="WEBSITE" align="center" width="2" color="#ffffff" position="0 0 0.01"></a-text>
-          <a-plane id="hitbox-website" class="clickable" width="0.46" height="0.17" position="0 0 0.02" material="opacity: 0; transparent: true"></a-plane>
-        </a-entity>
-
-        <!-- OFFER BUTTON -->
-        <a-entity position="0.24 -0.28 0.06">
-          <a-plane class="visual-btn" width="0.46" height="0.17" material="shader: flat; color: #ff7ea6; opacity: 1;" radius="0.085"></a-plane>
-          <a-text value="OFFER" align="center" width="2" color="#ffffff" position="0 0 0.01"></a-text>
-          <a-plane id="hitbox-discount" class="clickable" width="0.46" height="0.17" position="0 0 0.02" material="opacity: 0; transparent: true"></a-plane>
-        </a-entity>
-
+        <a-video
+          id="videoPlane"
+          src="#myVideo"
+          width="1"
+          height="0.56"
+          position="0 0 0.01"
+          visible="false"
+          material="shader: flat; opacity: 1;"
+        ></a-video>
       </a-entity>
+    </a-scene>
 
-    </a-entity>
+    <script>
+// ====== 🔥 ANTI-SHAKE / SMOOTH FOLLOW SYSTEM ======
+AFRAME.registerComponent("smooth-follow", {
+  schema: {
+    factor: { default: 0.15 }   // lower = smoother but slower
+  },
+  init() {
+    this.target = this.el.object3D;
+    this.lastPos = new THREE.Vector3();
+    this.lastRot = new THREE.Quaternion();
+  },
+  tick() {
+    const currentPos = this.target.position.clone();
+    const currentRot = this.target.quaternion.clone();
 
-  </a-scene>
-</body>
+    // Smooth Position
+    this.lastPos.lerp(currentPos, this.data.factor);
+    this.target.position.copy(this.lastPos);
+
+    // Smooth Rotation
+    this.lastRot.slerp(currentRot, this.data.factor);
+    this.target.quaternion.copy(this.lastRot);
+  }
+});
+// ====================================================
+
+const scene = document.querySelector("a-scene");
+const video = document.querySelector("#myVideo");
+const plane = document.querySelector("#videoPlane");
+const status = document.getElementById("status");
+
+let targetVisible = false;
+
+video.addEventListener("loadedmetadata", () => {
+  const aspect = video.videoWidth / video.videoHeight;
+  plane.setAttribute("width", 1);
+  plane.setAttribute("height", 1 / aspect);
+});
+
+document.body.addEventListener("click", () => {
+  if (targetVisible) {
+    if (video.muted) {
+      video.muted = false;
+      status.innerText = "🔊 Audio Enabled";
+      video.play();
+    }
+  }
+});
+
+scene.addEventListener("arReady", () => {
+  status.innerText = "✅ Point camera at your image target";
+});
+
+scene.addEventListener("targetFound", async () => {
+  targetVisible = true;
+  status.innerText = "🎬 Target found — tap to hear sound";
+  plane.setAttribute("visible", true);
+  try {
+    await video.play();
+  } catch {}
+});
+
+scene.addEventListener("targetLost", () => {
+  targetVisible = false;
+  status.innerText = "📷 Hold steady to keep video visible";
+  video.pause();
+  plane.setAttribute("visible", false);
+});
+</script>
+
+  </body>
 </html>
